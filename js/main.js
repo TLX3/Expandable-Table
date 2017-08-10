@@ -77,7 +77,7 @@ function createTable(dataSet, childKeys, numOfLayers) {
     keys.forEach((key, keyIndex) => {
       if (keyIndex === 0) {
         $(`#row_${index}`).append(`
-          <td><i onclick="openExpandable(${index}, 0)" class="fa fa-caret-right"></i>${datum[key]}</td>
+          <td><i onclick="toggleExpandable(${index}, 0, ${numOfLayers})" class="fa fa-caret-right"></i>${datum[key]}</td>
           `);
       } else {
         $(`#row_${index}`).append(`
@@ -104,7 +104,7 @@ function buildChildExpandables (currentLayer, index, childArray, childKeys) {
       expandableKeys.forEach((key, keyIndex) => {
         if (keyIndex === 0) {
           $(`#expandable_row${index}_layer${currentLayer}`).append(`
-            <td><i onclick="openExpandable(${index}, ${currentLayer + 1})" class="fa fa-caret-right"></i>${child[key]}</td>
+            <td><i onclick="toggleExpandable(${index}, ${currentLayer + 1}, ${childKeys.length})" style="margin-left: ${(currentLayer + 1)*10}px;" class="fa fa-caret-right"></i>${child[key]}</td>
             `);
         } else {
           $(`#expandable_row${index}_layer${currentLayer}`).append(`
@@ -125,8 +125,16 @@ function buildChildExpandables (currentLayer, index, childArray, childKeys) {
   }
 }
 
-function openExpandable (rowId, layer) {
-  $("#expandable_row" + rowId + '_layer' + layer).toggle();
+function toggleExpandable (rowId, layer, numOfLayers) {
+  for (let i = 0; i < numOfLayers; i++) {
+    if (i === layer) {
+      $("#expandable_row" + rowId + '_layer' + layer).toggle();
+    }
+    let el = $("#expandable_row" + rowId + '_layer' + i);
+    if (i > layer && el.is(":visible")) {
+      el.toggle();
+    }
+  }
 }
 
 createTable(dataSet, childKeys, numOfLayers);
