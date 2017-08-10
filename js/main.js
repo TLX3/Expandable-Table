@@ -1,11 +1,20 @@
-for(let i = 0; i < 30; i++) {
+//  Generate markup for all rows here
+//  Each row will have a distinct id and hidden expandable rows under them
+for(let i = 1; i <= 30; i++) {
     $("#body").append(`
-        <tr>
-        <td>Item 1</td>
-        <td>Item 2</td>
-        <td>Item 3</td>
-        <td>Item 4</td>
-        <td>Item 5</td>
+        <tr id='row_${i}''>
+        <td>Row ${i}</td>
+        <td>Row ${i}</td>
+        <td>Row ${i}</td>
+        <td>Row ${i}</td>
+        <td>Row ${i}</td>
+        </tr>
+        <tr class="expandable">
+        <td>Row ${i}</td>
+        <td>Row ${i}</td>
+        <td>Row ${i}</td>
+        <td>Row ${i}</td>
+        <td>Row ${i}</td>
         </tr>
         `);
 };
