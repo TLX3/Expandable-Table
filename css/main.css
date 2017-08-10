@@ -70,3 +70,8 @@ td {
 .expandable {
     display: none;
 }
+
+.fa {
+    cursor: pointer;
+    margin-right: 10px;
+}

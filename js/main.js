@@ -1,20 +1,24 @@
-//  Generate markup for all rows here
-//  Each row will have a distinct id and hidden expandable rows under them
+//  Generate markup for rows here
+//  Each expandable row will have a distinct id
 for(let i = 1; i <= 30; i++) {
     $("#body").append(`
-        <tr id='row_${i}''>
-        <td>Row ${i}</td>
+        <tr>
+        <td><i onclick='openExpandable(${i})' class="fa fa-caret-right"></i>Row ${i}</td>
         <td>Row ${i}</td>
         <td>Row ${i}</td>
         <td>Row ${i}</td>
         <td>Row ${i}</td>
         </tr>
-        <tr class="expandable">
-        <td>Row ${i}</td>
-        <td>Row ${i}</td>
-        <td>Row ${i}</td>
-        <td>Row ${i}</td>
-        <td>Row ${i}</td>
+        <tr id='expandable1_${i}' class="expandable">
+        <td>Hidden Row ${i}</td>
+        <td>Hidden Row ${i}</td>
+        <td>Hidden Row ${i}</td>
+        <td>Hidden Row ${i}</td>
+        <td>Hidden Row ${i}</td>
         </tr>
         `);
 };
+
+function openExpandable (rowId) {
+    $("#expandable1_" + rowId).toggle();
+}
