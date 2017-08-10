@@ -63,6 +63,15 @@ let dataSet = [
 
 
 function createTable(dataSet, childKeys, numOfLayers) {
+  let headers = Object.keys(dataSet[0]);
+  headers = headers.filter((key) => {
+    return !childKeys.includes(key);
+  });
+  headers.forEach((key) => {
+    $("#headers").append(`
+      <th>${key}</th>
+      `);
+  })
   dataSet.forEach((datum, index) => {
     let keys = Object.keys(datum);
     keys = keys.filter((key) => {
