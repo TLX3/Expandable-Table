@@ -103,8 +103,8 @@ function buildChildExpandables (currentLayer, index, childArray, childKeys) {
 
       expandableKeys.forEach((key, keyIndex) => {
         if (keyIndex === 0) {
-          $(`#expandable_${index}_${currentLayer}`).append(`
-            <td><i onclick="openExpandable(${index}, ${currentLayer})" class="fa fa-caret-right"></i>${child[key]}</td>
+          $(`#expandable_row${index}_layer${currentLayer}`).append(`
+            <td><i onclick="openExpandable(${index}, ${currentLayer + 1})" class="fa fa-caret-right"></i>${child[key]}</td>
             `);
         } else {
           $(`#expandable_row${index}_layer${currentLayer}`).append(`
