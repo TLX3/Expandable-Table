@@ -1,5 +1,6 @@
 //  Generate markup for rows here
 // User inputs data set and keys to expandable row by layer
+let fixedColumns = 0;
 let numOfLayers = 3;
 let childKeys = ['children1', 'children2', 'children3'];
 
@@ -96,13 +97,30 @@ function buildChildExpandables (currentLayer, index, childArray, childKeys) {
 }
 
 function toggleExpandable (rowId, layer, numOfLayers) {
-  for (let i = 0; i < numOfLayers; i++) {
+  for (let i = layer; i < numOfLayers; i++) {
     let clickedRow = document.getElementById(`expandable_row${rowId}_layer${i}`);
     if (i === layer) {
       clickedRow.classList.toggle('expandable');
+      if (layer === 0) {
+        let caret = document.getElementById(`row_${rowId}`).firstChild.firstChild;
+        if (caret.className === "fa fa-caret-down") {
+          caret.className = "fa fa-caret-right"
+        } else {
+          caret.className = "fa fa-caret-down"
+        }
+      } else {
+        let caret = document.getElementById(`expandable_row${rowId}_layer${i - 1}`).firstChild.firstChild;
+        if (caret.className === "fa fa-caret-down") {
+          caret.className = "fa fa-caret-right"
+        } else {
+          caret.className = "fa fa-caret-down"
+        }
+      }
     } else if (i > layer) {
       if (clickedRow.offsetParent !== null) {
         clickedRow.classList.toggle('expandable');
+        let caret = document.getElementById(`expandable_row${rowId}_layer${i - 1}`).firstChild.firstChild;
+        caret.className = "fa fa-caret-right";
       }
     }
   }
