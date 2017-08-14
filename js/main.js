@@ -2,102 +2,130 @@
 // User inputs data set and keys to expandable row by layer
 let numOfLayers = 3;
 let childKeys = ['children1', 'children2', 'children3'];
-var request = new XMLHttpRequest();
-request.open('GET', 'https://api.myjson.com/bins/kzzk1', true);
-request.onload = function() {
-  if (request.status >= 200 && request.status < 400) {
-    let dataSet = JSON.parse(request.responseText).response;
 
-    function createTable(dataSet, childKeys, numOfLayers) {
-      let headers = Object.keys(dataSet[0]);
-      headers = headers.filter((key) => {
-        return !childKeys.includes(key);
-      });
-      headers.forEach((key) => {
-        $("#headers").append(`
-          <th>${key}</th>
-          `);
-      })
-      dataSet.forEach((datum, index) => {
-        let keys = Object.keys(datum);
-        keys = keys.filter((key) => {
-          return !childKeys.includes(key);
-        });
+function createTable(dataSet, childKeys, numOfLayers) {
+  let headerNames = Object.keys(dataSet[0]);
+
+  headerNames = headerNames.filter((name) => {
+    return !childKeys.includes(name);
+  });
+
+  let headerRow = document.getElementById('headers');
+  headerNames.forEach((name) => {
+    let newTableHeader = document.createElement('th');
+    let newContent = document.createTextNode(name);
+    newTableHeader.appendChild(newContent);
+    headerRow.appendChild(newTableHeader);
+  });
+
+  dataSet.forEach((datum, index) => {
+    let dataKeys = Object.keys(datum);
+    dataKeys = dataKeys.filter((key) => {
+      return !childKeys.includes(key);
+    });
       //add table row
-      $("#body").append(`
-        <tr id="row_${index}">
-        </tr>
-        `);
+      let tableBody = document.getElementById('body');
+      let newTableRow = document.createElement('tr');
+      newTableRow.id = `row_${index}`;
+      tableBody.appendChild(newTableRow);
       //add table data for given row
-      keys.forEach((key, keyIndex) => {
+      dataKeys.forEach((key, keyIndex) => {
+        let currentRow = document.getElementById(`row_${index}`);
+        let newTableData = document.createElement('td');
+        let newContent = document.createTextNode(datum[key]);
         if (keyIndex === 0) {
-          $(`#row_${index}`).append(`
-            <td><i onclick="toggleExpandable(${index}, 0, ${numOfLayers})" class="fa fa-caret-right"></i>${datum[key]}</td>
-            `);
+          let newCaret = document.createElement('i');
+          newCaret.className = "fa fa-caret-right";
+          newCaret.setAttribute("onclick", `toggleExpandable(${index}, 0, ${numOfLayers})`);
+          newTableData.appendChild(newCaret);
+          newTableData.appendChild(newContent);
+          currentRow.append(newTableData);
         } else {
-          $(`#row_${index}`).append(`
-            <td>${datum[key]}</td>
-            `);
+          newTableData.appendChild(newContent);
+          currentRow.append(newTableData);
         }
       });
       buildChildExpandables(currentLayer = 0, index, datum[childKeys[currentLayer]], childKeys);
     });
-    }
+}
 
-    function buildChildExpandables (currentLayer, index, childArray, childKeys) {
+function buildChildExpandables (currentLayer, index, childArray, childKeys) {
+  if (childArray) {
+
+    childArray.forEach((child) => {
+      let expandableKeys = Object.keys(child);
+      expandableKeys = expandableKeys.filter((key) => {
+        return !childKeys.includes(key);
+      });
+
+      let tableBody = document.getElementById('body');
+      let newTableRow = document.createElement('tr');
+      newTableRow.id = `expandable_row${index}_layer${currentLayer}`;
+      newTableRow.className = "expandable";
+      tableBody.appendChild(newTableRow);
+
+      expandableKeys.forEach((key, keyIndex) => {
+        let currentExpandableRow = document.getElementById(`expandable_row${index}_layer${currentLayer}`);
+        let newTableData = document.createElement('td');
+        let newContent = document.createTextNode(child[key]);
+        if (keyIndex === 0) {
+          let newCaret = document.createElement('i');
+          newCaret.className = "fa fa-caret-right";
+          newCaret.style.marginLeft = `${(currentLayer + 1)*15}px`;
+          newCaret.setAttribute("onclick", `toggleExpandable(${index}, ${currentLayer + 1}, ${childKeys.length})`);
+          newTableData.appendChild(newCaret);
+          newTableData.appendChild(newContent);
+          currentExpandableRow.appendChild(newTableData);
+        } else {
+          newTableData.appendChild(newContent);
+          currentExpandableRow.appendChild(newTableData);
+        }
+      });
+
+      let currentChildKey = Object.keys(child).filter((key) => {
+        return childKeys.includes(key);
+      })[0];
+
+      childArray = child[currentChildKey];
       if (childArray) {
-        childArray.forEach((child) => {
-          let expandableKeys = Object.keys(child);
-          expandableKeys = expandableKeys.filter((key) => {
-            return !childKeys.includes(key);
-          });
+        currentLayer += 1;
+        buildChildExpandables(currentLayer, index, childArray, childKeys);
+      }
+    });
+  }
+}
 
-          $(`#body`).append(`
-            <tr class="expandable" id="expandable_row${index}_layer${currentLayer}"></tr>
-            `);
-
-          expandableKeys.forEach((key, keyIndex) => {
-            if (keyIndex === 0) {
-              $(`#expandable_row${index}_layer${currentLayer}`).append(`
-                <td><i onclick="toggleExpandable(${index}, ${currentLayer + 1}, ${childKeys.length})" style="margin-left: ${(currentLayer + 1)*15}px;" class="fa fa-caret-right"></i>${child[key]}</td>
-                `);
-            } else {
-              $(`#expandable_row${index}_layer${currentLayer}`).append(`
-                <td>${child[key]}</td>
-                `);
-            }
-          });
-
-          let currentChildKey = Object.keys(child).filter((key) => {
-            return childKeys.includes(key);
-          })[0];
-          childArray = child[currentChildKey];
-          if (childArray) {
-            currentLayer += 1;
-            buildChildExpandables(currentLayer, index, childArray, childKeys);
-          }
-        });
+function toggleExpandable (rowId, layer, numOfLayers) {
+  for (let i = 0; i < numOfLayers; i++) {
+    let clickedRow = document.getElementById(`expandable_row${rowId}_layer${i}`);
+    if (i === layer) {
+      clickedRow.classList.toggle('expandable');
+    } else if (i > layer) {
+      if (clickedRow.offsetParent !== null) {
+        clickedRow.classList.toggle('expandable');
       }
     }
+  }
+}
 
-    function toggleExpandable (rowId, layer, numOfLayers) {
-      for (let i = 0; i < numOfLayers; i++) {
-        if (i === layer) {
-          $("#expandable_row" + rowId + '_layer' + layer).toggle();
-        }
-        let el = $("#expandable_row" + rowId + '_layer' + i);
-        if (i > layer && el.is(":visible")) {
-          el.toggle();
-        }
-      }
-    }
+let tbody = document.getElementById('body');
+let thead = document.getElementById('head');
+tbody.addEventListener('scroll', function(e) {
+  thead.style.left = tbody.scrollLeft;
+});
 
-    $('tbody').scroll(function (e) {
-    $('thead').css("left", -$("tbody").scrollLeft()); //fix the thead relative to the body scrolling
-    $('thead th:nth-child(1)').css("left", $("tbody").scrollLeft()); //fix the first cell of the header
-    $('tbody td:nth-child(1)').css("left", $("tbody").scrollLeft()); //fix the first column of tdbody
-  });
+// $('#body').scroll(function (e) {
+//     $('#headers th:nth-child(1)').css("left", $("#body").scrollLeft()); //fix the first cell of the header
+//     $('#body td:nth-child(1)').css("left", $("#body").scrollLeft()); //fix the first column of tdbody
+//   });
 
+var request = new XMLHttpRequest();
+
+request.open('GET', 'https://api.myjson.com/bins/kzzk1', true);
+
+request.onload = function() {
+  if (request.status >= 200 && request.status < 400) {
+    let dataSet = JSON.parse(request.responseText).response;
     createTable(dataSet, childKeys, numOfLayers);
   }
 };
