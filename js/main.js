@@ -1,7 +1,8 @@
 // Generate markup for rows here
 // TODO: 
 // Update following code using jsDOM for node and remove all non js files
-// Using fs, user inputs data set json or link to it along with expansion keys by layer/level
+// Using fs, take user's input data set json or link to it along with expansion keys by layer/level
+// Create README
 let fixedColumns = 0;
 let numOfLayers = 2;
 let childKeys = ['children1', 'children2'];
@@ -29,11 +30,11 @@ function createTable(dataSet, childKeys, numOfLayers) {
       //add table row
       let tableBody = document.getElementById('body');
       let newTableRow = document.createElement('tr');
-      newTableRow.id = `row_${index}`;
+      newTableRow.id = `row${index}`;
       tableBody.appendChild(newTableRow);
       //add table data for given row
       dataKeys.forEach((key, keyIndex) => {
-        let currentRow = document.getElementById(`row_${index}`);
+        let currentRow = document.getElementById(`row${index}`);
         let newTableData = document.createElement('td');
         let newContent = document.createTextNode(datum[key]);
         if (keyIndex === 0) {
@@ -63,12 +64,16 @@ function buildChildExpandables (currentLayer, index, childArray, childKeys) {
 
         let tableBody = document.getElementById('body');
         let newTableRow = document.createElement('tr');
-        newTableRow.id = `${child.name}expandable_row${index}_layer${currentLayer}_item${childIndex + 1}`;
-        newTableRow.className = `expandable expandable_row${index}_layer${currentLayer}`;
+        let uniqueKey = Math.random().toString(36).substr(2, 10);
+        if(document.getElementById(`row${index}_layer${currentLayer}_item${childIndex + 1}_key${uniqueKey}`)) {
+          uniqueKey += 1;
+        }
+        newTableRow.id = `row${index}_layer${currentLayer}_item${childIndex + 1}_key${uniqueKey}`;
+        newTableRow.className = `expandable row${index}_layer${currentLayer}`;
         tableBody.appendChild(newTableRow);
 
         expandableKeys.forEach((key, keyIndex) => {
-            let currentExpandableRow = document.getElementById(`${child.name}expandable_row${index}_layer${currentLayer}_item${childIndex + 1}`);
+            let currentExpandableRow = document.getElementById(`row${index}_layer${currentLayer}_item${childIndex + 1}_key${uniqueKey}`);
             let newTableData = document.createElement('td');
             let newContent = document.createTextNode(child[key]);
             if (keyIndex === 0) {
@@ -106,13 +111,13 @@ function buildChildExpandables (currentLayer, index, childArray, childKeys) {
 
 function toggleExpandable (rowId, layer, numOfLayers, childIndex = null, childName = null) {
   for (let i = layer; i < numOfLayers; i++) {
-    let clickedRows = document.getElementsByClassName(`expandable_row${rowId}_layer${i}`);
+    let clickedRows = document.getElementsByClassName(`row${rowId}_layer${i}`);
     if (i === layer) {
       for (let j = 0; j < clickedRows.length; j++) {
           clickedRows[j].classList.toggle('expandable');
       }
     if (layer === 0) {
-      let caret = document.getElementById(`row_${rowId}`).firstChild.firstChild;
+      let caret = document.getElementById(`row${rowId}`).firstChild.firstChild;
       if (caret.className === "fa fa-caret-down") {
         caret.className = "fa fa-caret-right"
       } else {
@@ -138,17 +143,14 @@ function toggleExpandable (rowId, layer, numOfLayers, childIndex = null, childNa
 }
 }
 
+// Update thead position to match tbody position on scroll
 let tbody = document.getElementById('body');
 let thead = document.getElementById('head');
 tbody.addEventListener('scroll', function(e) {
-  thead.style.left = tbody.scrollLeft;
+  thead.style.left = -tbody.scrollLeft + 'px';
 });
 
-// $('#body').scroll(function (e) {
-//     $('#headers th:nth-child(1)').css("left", $("#body").scrollLeft()); //fix the first cell of the header
-//     $('#body td:nth-child(1)').css("left", $("#body").scrollLeft()); //fix the first column of tdbody
-//   });
-//
+
 // $('tbody').scroll(function (e) {
 //     $('thead').css("left", -$("tbody").scrollLeft()); //fix the thead relative to the body scrolling
 //      $('thead th:nth-child(1)').css("left", $("tbody").scrollLeft()); //fix the first cell of the header
