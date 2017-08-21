@@ -40,7 +40,7 @@ function createTable(dataSet, childKeys, numOfLayers) {
         if (keyIndex === 0) {
           let newCaret = document.createElement('i');
           newCaret.className = "fa fa-caret-right";
-          newCaret.setAttribute("onclick", `toggleExpandable(${index}, 0, ${numOfLayers})`);
+          newCaret.setAttribute("onclick", `toggleExpandable(${index}, 0, ${numOfLayers}, 0, 0, event)`);
           newTableData.appendChild(newCaret);
           newTableData.appendChild(newContent);
           currentRow.append(newTableData);
@@ -49,11 +49,11 @@ function createTable(dataSet, childKeys, numOfLayers) {
           currentRow.append(newTableData);
       }
   });
-      buildChildExpandables(currentLayer = 0, index, datum[childKeys[currentLayer]], childKeys);
+      buildChildExpandables(currentLayer = 0, index, datum[childKeys[currentLayer]], childKeys, newTableRow, index);
   });
 }
 
-function buildChildExpandables (currentLayer, index, childArray, childKeys) {
+function buildChildExpandables (currentLayer, index, childArray, childKeys, parentRow, parentIndex) {
   if (childArray) {
 
     childArray.forEach((child, childIndex) => {
@@ -69,7 +69,8 @@ function buildChildExpandables (currentLayer, index, childArray, childKeys) {
           uniqueKey += 1;
         }
         newTableRow.id = `row${index}_layer${currentLayer}_item${childIndex + 1}_key${uniqueKey}`;
-        newTableRow.className = `expandable row${index}_layer${currentLayer}`;
+        newTableRow.className = `expandable row${index}_layer${currentLayer}_parent${parentIndex}_child${childIndex}`;
+      
         tableBody.appendChild(newTableRow);
 
         expandableKeys.forEach((key, keyIndex) => {
@@ -86,7 +87,7 @@ function buildChildExpandables (currentLayer, index, childArray, childKeys) {
                 let childName = child.name;
                 newCaret.className = "fa fa-caret-right";
                 newCaret.style.marginLeft = `${(currentLayer + 1)*15}px`;
-                newCaret.setAttribute("onclick", `toggleExpandable(${index}, ${currentLayer + 1}, ${childKeys.length}, ${childIndex + 1})`);
+                newCaret.setAttribute("onclick", `toggleExpandable(${index}, ${currentLayer + 1}, ${childKeys.length}, ${childIndex}, ${parentIndex}, event)`);
                 newTableData.appendChild(newCaret);
               }
               newTableData.appendChild(newContent);
@@ -103,43 +104,39 @@ function buildChildExpandables (currentLayer, index, childArray, childKeys) {
 
         childArray = child[currentChildKey];
         if (childArray) {
-            buildChildExpandables(currentLayer + 1, index, childArray, childKeys);
+            buildChildExpandables(currentLayer + 1, index, childArray, childKeys, newTableRow, childIndex);
         }
     });
 }
 }
 
-function toggleExpandable (rowId, layer, numOfLayers, childIndex = null, childName = null) {
-  for (let i = layer; i < numOfLayers; i++) {
-    let clickedRows = document.getElementsByClassName(`row${rowId}_layer${i}`);
-    if (i === layer) {
-      for (let j = 0; j < clickedRows.length; j++) {
-          clickedRows[j].classList.toggle('expandable');
-      }
-    if (layer === 0) {
-      let caret = document.getElementById(`row${rowId}`).firstChild.firstChild;
-      if (caret.className === "fa fa-caret-down") {
-        caret.className = "fa fa-caret-right"
-      } else {
-        caret.className = "fa fa-caret-down"
-      }
-    } else {
-      // let caret = document.getElementById(`${childName}expandable_row${rowId}_layer${i - 1}_item${childIndex}`).firstChild.firstChild;
-      // if (caret.className === "fa fa-caret-down") {
-      //   caret.className = "fa fa-caret-right"
-      // } else {
-      //   caret.className = "fa fa-caret-down"
-      // } 
-    }
-} else if (i > layer) {
-    for (let j = 0; j < clickedRows.length; j++) {
-        if (clickedRows[j].offsetParent !== null) {
-          clickedRows[j].classList.toggle('expandable');
-      }
+function toggleExpandable (rowId, layer, numOfLayers, childIndex, parentIndex, event) {
+  let caret = event.target;
+  if (caret.className === "fa fa-caret-down") {
+    caret.className = "fa fa-caret-right"
+  } else {
+    caret.className = "fa fa-caret-down"
   }
-    // let caret = document.getElementById(`expandable_row${rowId}_layer${i - 1}`).firstChild.firstChild;
-    // caret.className = "fa fa-caret-right";
-}
+  for (let i = layer; i < numOfLayers; i++) {
+    if (i === layer) {
+      if(parentIndex !== childIndex) {
+        parentIndex = childIndex;
+      }
+      for (let k = 0; k < 5; k++) {
+        let clickedRows = document.getElementsByClassName(`row${rowId}_layer${i}_parent${parentIndex}_child${k}`);
+        for (let j = 0; j < clickedRows.length; j++) {
+            clickedRows[j].classList.toggle('expandable');
+        }
+      }
+    } else if (i > layer) {
+      //   for (let j = 0; j < clickedRows.length; j++) {
+      //       if (clickedRows[j].offsetParent !== null) {
+      //         clickedRows[j].classList.toggle('expandable');
+      //     }
+      // }
+        // let caret = document.getElementById(`expandable_row${rowId}_layer${i - 1}`).firstChild.firstChild;
+        // caret.className = "fa fa-caret-right";
+    }
 }
 }
 
