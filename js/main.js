@@ -40,7 +40,7 @@ function createTable(dataSet, childKeys, numOfLayers) {
         if (keyIndex === 0) {
           let newCaret = document.createElement('i');
           newCaret.className = "fa fa-caret-right";
-          newCaret.setAttribute("onclick", `toggleExpandable(${index}, 0, ${numOfLayers}, 0, 0, event)`);
+          newCaret.setAttribute("onclick", `toggleExpandable(${index}, 0, ${numOfLayers}, ${index}, 0, event)`);
           newTableData.appendChild(newCaret);
           newTableData.appendChild(newContent);
           currentRow.append(newTableData);
