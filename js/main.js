@@ -4,8 +4,8 @@
 // Using fs, take user's input data set json or link to it along with expansion keys by layer/level
 // Create README
 let fixedColumns = 0;
-let numOfLayers = 2;
-let childKeys = ['children1', 'children2'];
+let childKeys = ['children1', 'children2', 'children3', 'children4'];
+let numOfLayers = childKeys.length;
 
 function createTable(dataSet, childKeys, numOfLayers) {
   let headerNames = Object.keys(dataSet[0]);
@@ -40,7 +40,7 @@ function createTable(dataSet, childKeys, numOfLayers) {
         if (keyIndex === 0) {
           let newCaret = document.createElement('i');
           newCaret.className = "fa fa-caret-right";
-          newCaret.setAttribute("onclick", `toggleExpandable(${index}, 0, ${numOfLayers}, ${index}, 0, event)`);
+          newCaret.setAttribute("onclick", `toggleExpandable(${index}, 0, ${numOfLayers}, ${index}, 0, event, ${dataSet.length})`);
           newTableData.appendChild(newCaret);
           newTableData.appendChild(newContent);
           currentRow.append(newTableData);
@@ -87,7 +87,7 @@ function buildChildExpandables (currentLayer, index, childArray, childKeys, pare
                 let childName = child.name;
                 newCaret.className = "fa fa-caret-right";
                 newCaret.style.marginLeft = `${(currentLayer + 1)*15}px`;
-                newCaret.setAttribute("onclick", `toggleExpandable(${index}, ${currentLayer + 1}, ${childKeys.length}, ${childIndex}, ${parentIndex}, event)`);
+                newCaret.setAttribute("onclick", `toggleExpandable(${index}, ${currentLayer + 1}, ${childKeys.length}, ${childIndex}, ${parentIndex}, event, ${childArray.length})`);
                 newTableData.appendChild(newCaret);
               }
               newTableData.appendChild(newContent);
@@ -110,7 +110,7 @@ function buildChildExpandables (currentLayer, index, childArray, childKeys, pare
 }
 }
 
-function toggleExpandable (rowId, layer, numOfLayers, childIndex, parentIndex, event) {
+function toggleExpandable (rowId, layer, numOfLayers, childIndex, parentIndex, event, numOfChildren) {
   let caret = event.target;
   if (caret.className === "fa fa-caret-down") {
     caret.className = "fa fa-caret-right"
@@ -122,18 +122,21 @@ function toggleExpandable (rowId, layer, numOfLayers, childIndex, parentIndex, e
       if(parentIndex !== childIndex) {
         parentIndex = childIndex;
       }
-      for (let k = 0; k < 5; k++) {
+      for (let k = 0; k < numOfChildren; k++) {
         let clickedRows = document.getElementsByClassName(`row${rowId}_layer${i}_parent${parentIndex}_child${k}`);
         for (let j = 0; j < clickedRows.length; j++) {
             clickedRows[j].classList.toggle('expandable');
         }
       }
     } else if (i > layer) {
-      //   for (let j = 0; j < clickedRows.length; j++) {
-      //       if (clickedRows[j].offsetParent !== null) {
-      //         clickedRows[j].classList.toggle('expandable');
-      //     }
-      // }
+        // for (let k = 0; k < numOfChildren; k++) {
+        //     let clickedRows = document.getElementsByClassName(`row${rowId}_layer${i}_parent${parentIndex}_child${k}`);
+        //     for (let j = 0; j < clickedRows.length; j++) {
+        //         if (clickedRows[j].offsetParent !== null) {
+        //             clickedRows[j].classList.toggle('expandable');
+        //         }
+        //     }
+        // }
         // let caret = document.getElementById(`expandable_row${rowId}_layer${i - 1}`).firstChild.firstChild;
         // caret.className = "fa fa-caret-right";
     }
@@ -155,9 +158,10 @@ tbody.addEventListener('scroll', function(e) {
 //  });
 
 
-var request = new XMLHttpRequest();
+let request = new XMLHttpRequest();
 
-request.open('GET', 'https://api.myjson.com/bins/1c98eh', true);
+// https://api.myjson.com/bins/1c98eh
+request.open('GET', 'https://api.myjson.com/bins/1281e5', true);
 
 request.onload = function() {
   if (request.status >= 200 && request.status < 400) {
